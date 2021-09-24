@@ -1,0 +1,165 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+</head>
+<body>
+  <div>
+    {% include 'messages.html' %}
+    </div>
+<!-- Card -->
+{% for item in trend %}
+<div class="col-lg-4 col-md-6" style="padding: 20px!important">
+        <div class="movie_col ">
+            <div class="card">
+                <img class="card-img-top" style="height: 15rem!important" src="media/{{item.image}}">
+                <div class="card-body">
+                    <h5 class="card-title">{{item.name}}</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Brand: {{item.brand}}</li>
+                  <!--  <li class="list-group-item">Material: cotton</li>-->
+                   <!-- <li class="list-group-item">size: <a href="{{dict_item.album_url}}">XL</a> </li>-->
+                </ul>
+                <div class="card-body">
+                    <a href="{{item.url}}" target="_blank" class="card-link">Buy Now</a>
+                </div>
+            </div>
+        </div>
+        </div>
+        
+{% endfor %}
+
+{% if user.is_authenticated %}
+<form method="POST">
+  {%csrf_token%}
+  <div class="form-group">
+    <label for="exampleInputEmail1">Feedback</label>
+    <input type="text" name="feed" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Give us a feedback">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{%else%}
+<p>Login/Signup to Feedback</p>
+<a class="btn" href="login">Login In</a>
+<a class="btn" href="register">Sign Up</a>
+{%endif%}
+
+       {% for post in posts|slice:":5" %}
+                <a href="{% url 'post' post.id post.slug %}"><img src="{{post.thumbnail.url}}" alt=""></a>
+                  <h2><a href="{% url 'post' post.id post.slug %}"></a>{{ post.title }}</h2>
+                  <span class="subheading">Overview - {{post.overview}}</span>
+               {% for cat in post.categories.all %}
+                   <a href="#">{{cat.title}}</a>, 
+                 {% endfor %}
+                    <p class="mb-0"><a href="#">{{post.time_upload}}</a> | <a href="#">{{post.read}} reads</a></p> 
+          {% endfor %}
+          <h2><b>Editor Picks</b></h2>
+          <br>
+            {% for author_posts in author_post %}
+                  <a href="" class="img w-100 mb-3 mb-md-0" style="background-image: url('{{author_posts.thumbnail.url}}');"></a>
+                    <h2><a href=""></a>{{author_posts.title}}</h2>
+                    <span class="subheading">{{author_posts.overview}}</span>
+                    {% for cats in author_posts.categories.all %}
+                    <a href="#">{{cats.title}}</a>, 
+                  {% endfor %}
+                      <p class="mb-0"><a href="#">{{author_posts.time_upload|timesince}} ago</a> | <b>Author :</b> {{author_posts.auther.user.username}} </p> 
+                {%endfor%}
+                <ul class="pagination">
+                  {% if posts.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{posts.previous_page_number}}" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                  {% endif %}
+                  <li class="page-item"><a class="page-link" href="#">{{posts.number}}</a></li>
+                  {% if posts.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{posts.next_page_number}}" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                  {% endif %}
+                </ul>
+<div>
+  <h1>Let's trace Your Location</h1>
+    <button onclick="getLocation()" type="submit">Get Location</button>
+</div>
+<div>
+  <p id="output"></p>
+</div>
+<form action="" method="post">
+  {%csrf_token%}
+  <input id="sexy" type="search" name="add" placeholder="Enter Your Address">
+  <input type="submit" value="Submit">
+</form>
+<div>
+  {%if flag == 0 %}
+  <p>
+    Latitude: {{lat}}
+    <br>
+    Longitude: {{lng}}
+  </p>
+  {%endif%}
+</div>
+<div>
+  Nearby:
+  {%for near in nearby%}
+  {{near.id}}
+  {%endfor%}
+
+</div>
+                <!--Start of Tawk.to Script-->
+                <script
+                src="https://code.jquery.com/jquery-3.6.0.js"
+                integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+                crossorigin="anonymous"></script>
+<script>
+  var x = document.getElementById('output');
+  var y = document.getElementById('sexy');
+  function getLocation() {
+    if(navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition);
+
+    }
+    else {
+      x.innerHTML = "Browser Not Supporting";
+      y.value = x.textContent;
+    }
+  }
+  function showPosition(position)
+  {
+    //x.innerHTML = "Latitude = "+position.coords.latitude;
+    //x.innerHTML+= " <br>"
+    //x.innerHTML+= "Longitude = "+position.coords.longitude;
+
+    var locAPI = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+position.coords.latitude+","+position.coords.longitude+"&sensor=true&key=AIzaSyAfGyx7ZqkhOa3-MV7KkJPCUqVI67am_qM";
+    $.get({
+      url: locAPI,
+      success: function(data) {
+        console.log(data);
+        x.innerHTML = data.results[0].address_components[1].long_name+','+data.results[0].address_components[2].long_name;
+        y.value = x.textContent;
+      }
+    });
+  }
+</script>        
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6051a205f7ce18270930e606/1f0ve1pu9';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+</body>
+</html>

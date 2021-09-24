@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+</head>
+<body>
+    <div>
+        {% if messages %}
+        {% for message in messages %}
+          <script>M.toast({html: "{{message}}", classes: 'blue rounded', displayLength:2000});</script>
+        {% endfor %}
+        {%else%}
+        <p>No messages</p>
+        {% endif %}
+    </div>
+    <form action="" method="post">
+        {%csrf_token%}
+        <select name="gender" id="">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Prefer not to say">Prefer Not to Say</option>
+        </select>
+        <input type="number" name="mobno" id="" placeholder="Enter Mobile Number">
+        <input type="number" name="age" id="" placeholder="Enter Age">
+        <input type="submit" value="submit">
+    </form>
+</body>
+</html>
